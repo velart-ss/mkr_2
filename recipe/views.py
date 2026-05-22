@@ -1,5 +1,8 @@
-from django.shortcuts import render
+
 from .models import Recipe, Category
+from django.shortcuts import render
+from django.db.models import Count
+from .models import Category
 
 
 def main(request):
@@ -11,17 +14,9 @@ def main(request):
 
 
 
+
+
 def category_list(request):
-    categories = Category.objects.all()
-
-    category_data = []
-
-    for category in categories:
-        category_data.append({
-            'name': category.name,
-            'recipe_count': category.recipe_set.count()
-        })
-
-    return render(request, 'category_list.html', {
-        'categories': category_data
-    })
+    # Django зробить один оптимізований SQL-запит
+    categories = Category.objects.annotate(recipe_count=Count('categories'))
+    return render(request, 'category_list.html', {'categories': categories})
